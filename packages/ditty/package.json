@@ -1,0 +1,33 @@
+{
+  "name": "ditty",
+  "version": "0.0.0",
+  "description": "A component library base on Vue 3",
+  "keywords": [
+    "ditty",
+    "component library",
+    "component framework",
+    "Vue3",
+    "Typescript",
+    "Jsx"
+  ],
+  "author": {
+    "name": "chenment"
+  },
+  "homepage": "https://github.com/chenment/dittyui#readme",
+  "license": "MIT",
+  "main": "dist/ditty.js",
+  "module": "lib/main.mjs",
+  "files": [
+    "dist/",
+    "lib/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chenment/dittyui.git"
+  },
+  "scripts": {
+  },
+  "bugs": {
+    "url": "https://github.com/chenment/dittyui/issues"
+  }
+}
