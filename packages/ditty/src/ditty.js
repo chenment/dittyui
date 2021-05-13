@@ -3,5 +3,5 @@
 module.exports = ditty;
 
 function ditty() {
-    // TODO
+  // TODO
 }

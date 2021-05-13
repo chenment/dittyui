@@ -1,5 +1,14 @@
+.DS_Store
 node_modules
+.env
+.yarn
 
+# IDE user config
 .vscode
+.idea
+.vs
+
+# Istanbul coverage
+coverage/
 
 *.log
