@@ -3,7 +3,7 @@
     [
       "@babel/env",
       {
-        "module": false
+        "modules": false
       }
     ],
     "@babel/preset-typescript"

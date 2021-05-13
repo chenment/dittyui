@@ -1,3 +1,5 @@
 node_modules
 scripts
 .husky
+
+packages/ditty/lib
