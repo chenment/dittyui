@@ -25,8 +25,7 @@
     "type": "git",
     "url": "git+https://github.com/chenment/dittyui.git"
   },
-  "scripts": {
-  },
+  "scripts": {},
   "bugs": {
     "url": "https://github.com/chenment/dittyui/issues"
   }
