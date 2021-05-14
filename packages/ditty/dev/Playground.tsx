@@ -1,9 +1,18 @@
 import { defineComponent } from 'vue'
-import { DButton } from '../src/ditty'
+import { DButton } from '../src/main'
 
 export default defineComponent({
   name: 'Playground',
   setup() {
-    return () => <DButton class="btn">Button</DButton>
+    const handleClick = (e: MouseEvent) => {
+      console.log('oh')
+      console.log(e.target)
+    }
+
+    return () => (
+      <DButton block color="danger" onClick={handleClick}>
+        button
+      </DButton>
+    )
   },
 })
