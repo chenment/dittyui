@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  img,
+  svg {
+    display: inline;
+  }
+}
+
+@layer components {
+  .svg-icon svg {
+    @apply w-full h-full !important;
+  }
+
+  .svg-icon svg [fill]:not(g) {
+    @apply fill-current;
+  }
+}
