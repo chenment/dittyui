@@ -8,7 +8,8 @@
     "cz": "cz",
     "dev": "yarn lerna run dev --scope ditty --stream",
     "build": "yarn lerna run build --scope ditty --stream",
-    "clean": "yarn lerna clean"
+    "clean": "yarn lerna clean",
+    "ditty": "yarn workspace ditty"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.16",
@@ -45,5 +46,10 @@
     "*.{ts,tsx,js,jsx,vue}": [
       "prettier --write ."
     ]
+  },
+  "dependencies": {
+    "autoprefixer": "^10.2.6",
+    "postcss": "^8.3.0",
+    "tailwindcss": "^2.1.2"
   }
 }
