@@ -1,20 +1,24 @@
 <template>
   <div class="app">
-    <ButtonPg />
-    <SFCPlayground />
+    <!-- <ButtonPg /> -->
+    <InputPg />
+    <!-- <SFCPlayground /> -->
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, provide } from 'vue'
 import ButtonPg from './ButtonPg'
-import SFCPlayground from './SFCPlayground.vue'
+import InputPg from './InputPg'
 
 export default defineComponent({
   name: 'App',
   components: {
     ButtonPg,
-    SFCPlayground,
+    InputPg,
+  },
+  setup() {
+    provide('hello', 'world')
   },
 })
 </script>
