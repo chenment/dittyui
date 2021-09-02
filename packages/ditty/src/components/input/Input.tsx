@@ -1,4 +1,14 @@
-import { computed, defineComponent, onUpdated, PropType, ref } from 'vue'
+import {
+  computed,
+  defineComponent,
+  PropType,
+  ref,
+  VNode,
+  withDirectives,
+  getCurrentInstance,
+  watch,
+} from 'vue'
+import { inputComposingDirective } from './inputDirective'
 import useInputClasses from './useInputClasses'
 
 /**
@@ -31,9 +41,6 @@ export default defineComponent({
     value: {
       type: String as PropType<string>,
     },
-    modelValue: {
-      type: String as PropType<string>,
-    },
     addonBefore: {
       type: String as PropType<string>,
     },
@@ -49,21 +56,11 @@ export default defineComponent({
     placeholder: {
       type: String as PropType<string>,
     },
-    onInput: {
-      type: Function as PropType<(e: Event) => void>,
-    },
-    onChange: {
-      type: Function as PropType<(e: Event) => void>,
-    },
-    onFocus: {
-      type: Function as PropType<(e: FocusEvent) => void>,
-    },
-    onBlur: {
-      type: Function as PropType<(e: Event) => void>,
-    },
-    disabled: {
-      type: Boolean as PropType<boolean>,
-    },
+    onInput: Function as PropType<(e: Event) => void>,
+    onChange: Function as PropType<(e: Event) => void>,
+    onFocus: Function as PropType<(e: FocusEvent) => void>,
+    onBlur: Function as PropType<(e: Event) => void>,
+    disabled: Boolean as PropType<boolean>,
     // clearable: {
     //   type: Boolean as PropType<boolean>,
     // },
@@ -76,8 +73,21 @@ export default defineComponent({
     // if we have addonBefore prop and addonBefore slot at the same time, use slot define first
     // TODO: And warning (the same with addonAfter, prefix, suffix)
 
-    const value = props.value === undefined ? props.modelValue : props.value
-    const valueRef = ref(value === undefined ? '' : value)
+    const vm = getCurrentInstance()!.proxy!
+
+    const value = props.value === undefined ? '' : props.value
+    const valueStateRef = ref(value === undefined ? '' : value)
+
+    const inputRef = ref<HTMLInputElement | null>(null)
+
+    watch(
+      () => props.value,
+      (value) => {
+        if (value !== undefined) {
+          valueStateRef.value = value
+        }
+      }
+    )
 
     const hasAddonBefore = computed(
       () => !!slots.addonBefore || !!props.addonBefore
@@ -112,103 +122,137 @@ export default defineComponent({
     const { addonBeforeClasses, addonAfterClasses, inputAffixClasses } =
       useInputClasses(hasAddonBefore, hasAddonAfter, isFocusRef, isDisabled)
 
-    const addonBefore = computed(() =>
-      hasAddonBefore.value ? (
-        <span
-          class={[
-            addonBeforeClasses.value,
-            paddingSizeClasses.value,
-            fontSizeClasses.value,
-          ]}
-        >
-          {slots.addonBefore?.() || props.addonBefore}
-        </span>
-      ) : null
-    )
+    function handleChange(e: Event) {
+      const { value, composing } = e.target as any
+      if (valueStateRef.value === value || composing) return
 
-    const addonAfter = computed(() =>
-      hasAddonAfter.value ? (
-        <span
-          class={[
-            addonAfterClasses.value,
-            paddingSizeClasses.value,
-            paddingSizeClasses.value,
-          ]}
-        >
-          {slots.addonAfter?.() || props.addonAfter}
-        </span>
-      ) : null
-    )
+      if (!('value' in props)) {
+        valueStateRef.value = value
+      } else {
+        // force update to sync input's view with value
+        // if not set, after input, input value won't sync with dom input value
+        vm.$forceUpdate()
+      }
 
-    const prefix = computed(() =>
-      hasPrefix.value ? (
-        <span class={['flex mr-2']}>{slots.prefix?.() || props.prefix}</span>
-      ) : null
-    )
-
-    const suffix = computed(() =>
-      hasSuffix.value ? (
-        <span class={['flex ml-2']}>{slots.suffix?.() || props.suffix}</span>
-      ) : null
-    )
-
-    const handleInput = (e: Event) => {
-      console.log('handleInput', (e.target as HTMLInputElement).value)
-      emit('update:modelValue', (e.target as HTMLInputElement).value)
-      valueRef.value = (e.target as HTMLInputElement).value
+      emit('update:value', value)
+      emit('change', e)
+      emit('input', e)
     }
 
-    const handleChange = (e: Event) => {
-      console.log('handleChange', (e.target as HTMLInputElement).value)
-      props.onChange?.(e)
-    }
-
-    const handleFocus = (e: FocusEvent) => {
-      console.log('handleFocus', (e.target as HTMLInputElement).value)
+    function handleFocus(e: FocusEvent) {
       isFocusRef.value = true
       props.onFocus?.(e)
     }
 
-    const handleBlur = (e: Event) => {
-      console.log('handleBlur', (e.target as HTMLInputElement).value)
+    function handleBlur(e: Event) {
       isFocusRef.value = false
       props.onBlur?.(e)
     }
 
-    return () => {
-      return (
-        <span class="inline-block w-full align-top">
-          <span class="flex w-full">
-            {addonBefore.value}
-            <span
-              class={[
-                inputAffixClasses.value,
-                paddingSizeClasses.value,
-                fontSizeClasses.value,
-              ]}
-            >
-              {prefix.value}
-              <input
-                class={[
-                  'inline-block w-full bg-transparent border-0 outline-none',
-                  { 'cursor-not-allowed': isDisabled.value },
-                ]}
-                type={props.type}
-                value={valueRef.value}
-                placeholder={props.placeholder}
-                disabled={isDisabled.value}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                onInput={handleInput}
-                onChange={handleChange}
-                {...attrs}
-              />
-              {suffix.value}
-            </span>
-            {addonAfter.value}
-          </span>
-        </span>
-      )
+    return {
+      inputAffixClasses,
+      paddingSizeClasses,
+      fontSizeClasses,
+      addonBeforeClasses,
+      addonAfterClasses,
+      inputRef,
+      isDisabled,
+      valueStateRef,
+      hasAddonBefore,
+      hasAddonAfter,
+      hasPrefix,
+      hasSuffix,
+      handleFocus,
+      handleBlur,
+      handleChange,
     }
+  },
+  methods: {
+    renderAddonBefore() {
+      return this.hasAddonBefore ? (
+        <span
+          class={[
+            this.addonBeforeClasses,
+            this.paddingSizeClasses,
+            this.fontSizeClasses,
+          ]}
+        >
+          {this.$slots.addonBefore?.() || this.$props.addonBefore}
+        </span>
+      ) : null
+    },
+    renderAddonAfter() {
+      return this.hasAddonAfter ? (
+        <span
+          class={[
+            this.addonAfterClasses,
+            this.paddingSizeClasses,
+            this.paddingSizeClasses,
+          ]}
+        >
+          {this.$slots.addonAfter?.() || this.$props.addonAfter}
+        </span>
+      ) : null
+    },
+    renderPrefix() {
+      return this.hasPrefix ? (
+        <span class={['flex mr-2']}>
+          {this.$slots.prefix?.() || this.$props.prefix}
+        </span>
+      ) : null
+    },
+    renderSuffix() {
+      return this.hasSuffix ? (
+        <span class={['flex ml-2']}>
+          {this.$slots.suffix?.() || this.$props.suffix}
+        </span>
+      ) : null
+    },
+    renderInput() {
+      const inputNode: VNode = (
+        <input
+          ref={this.saveInputRef}
+          class={[
+            'inline-block w-full bg-transparent border-0 outline-none',
+            { 'cursor-not-allowed': this.isDisabled },
+          ]}
+          type={this.$props.type}
+          value={this.valueStateRef}
+          placeholder={this.$props.placeholder}
+          disabled={this.isDisabled}
+          onFocus={this.handleFocus}
+          onBlur={this.handleBlur}
+          onInput={this.handleChange}
+          onChange={this.handleChange}
+          {...this.$attrs}
+        />
+      )
+
+      return withDirectives(inputNode, [[inputComposingDirective]])
+    },
+    saveInputRef(input: any) {
+      this.inputRef = input
+    },
+  },
+  render() {
+    return (
+      <span class="inline-block w-full align-top">
+        <span class="flex w-full">
+          {this.renderAddonBefore()}
+          <span
+            class={[
+              this.inputAffixClasses,
+              this.paddingSizeClasses,
+              this.fontSizeClasses,
+            ]}
+          >
+            {this.renderPrefix()}
+            {this.renderInput()}
+            {this.renderSuffix()}
+          </span>
+          {this.renderAddonAfter()}
+        </span>
+      </span>
+    )
   },
 })
