@@ -4,7 +4,7 @@ import type { Size } from './useSizeClasses'
 import useVariantClasses from './useVariantClasses'
 import useStateClasses from './useStateClasses'
 import { useSizeClasses, useIconSizeClasses } from './useSizeClasses'
-import { LoadingIcon } from '../icon'
+import { LoadingIcon } from '../_util/icons'
 
 const buttonClasses = [
   'inline-block',
