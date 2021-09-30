@@ -29,6 +29,7 @@
     "dev": "vite --config dev/vite.config.ts serve dev",
     "build": "yarn build:lib",
     "build:lib": "rimraf lib && yarn babel src --out-dir lib --ignore \"**/__tests__\" --source-maps --extensions \".ts\",\".tsx\" --copy-files --no-copy-ignored --out-file-extension .mjs",
+    "docs": "vitepress dev docs",
     "clean": "lerna clean",
     "tailwind-init": "npx tailwindcss init -p"
   },

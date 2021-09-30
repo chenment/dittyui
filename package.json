@@ -9,7 +9,8 @@
     "dev": "yarn lerna run dev --scope ditty --stream",
     "build": "yarn lerna run build --scope ditty --stream",
     "clean": "yarn lerna clean",
-    "ditty": "yarn workspace ditty"
+    "ditty": "yarn workspace ditty",
+    "docs": "yarn lerna run docs --scope ditty --stream"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.16",
@@ -35,6 +36,7 @@
     "prettier": "^2.3.0",
     "rimraf": "^3.0.2",
     "typescript": "^4.2.4",
+    "vitepress": "^0.17.1",
     "vue": "^3.2.7"
   },
   "config": {
